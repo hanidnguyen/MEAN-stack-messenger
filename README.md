@@ -1,27 +1,38 @@
-# MeanCourse
+This backend folder can be anywhere since it is not related to angular front end in anyway.
+Placed it in the mean-course folder simply for learning.
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.5.
+____________
 
-## Development server
+This is a RESTful API project.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+____________
 
-## Code scaffolding
+To connect to Mongodb create a new cluster on mongodb (there is a free version) and add a new member for database access (save your auto-generated password, you will need it to connect to the database later).
+Free version does not allow you to see your database on the web so connect to your database with a MongoDB shell, follow its instruction to download and run the lines in your computer command prompt.
+Now to connect your express app to the database, import mongoose and connect to your database using mongoose.connect.
+Link is provided through yourMongoDB (on website) -> connect -> connect your application. Replace <password> with your saved database user password.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+**IMPORTANT**
+If you get error on connecting to your database, you might need to update your IP address in Network Access on the mongodb website.
 
-## Running unit tests
+To connect to database:
+1. cd to mongoshell/bin
+2. use in computer terminal:
+mongosh "mongodb+srv://cluster0.vqyni.mongodb.net/myFirstDatabase" --apiVersion 1 --username Hani
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+To use the interactive Javascript interface on terminal:
 
-## Running end-to-end tests
+show dbs: list all database
+use [database-name]: to switch to a database
+show tables: list all tables
+db.[table-name].find(): list all entries in table
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+To observe real-time front-end:
+  run ng serve in terminal in project folder
 
-## Further help
+To observe back-end real-time:
+  run npm run start:server in terminal in project folder
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
