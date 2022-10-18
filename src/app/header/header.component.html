@@ -1,1 +1,13 @@
-<mat-toolbar color="primary">MyMessages</mat-toolbar>
+<mat-toolbar color="primary">
+  <span><a routerLink="/">MyMessages</a></span>
+  <span class="spacer"></span>
+  <ul>
+    <li>
+      <!-- hook up routerLink -->
+      <!-- routerlinkactive to switch component color while route is active -->
+      <a mat-button routerLink="/create" routerLinkActive="mat-accent">
+        New Post
+      </a>
+    </li>
+  </ul>
+</mat-toolbar>

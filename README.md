@@ -1,4 +1,4 @@
-This backend folder can be anywhere since it is not related to angular front end in anyway.
+This backend folder can be anywhere since it is not related to angular front end in any way.
 Placed it in the mean-course folder simply for learning.
 
 ____________
@@ -30,9 +30,9 @@ show tables: list all tables
 db.[table-name].find(): list all entries in table
 
 To observe real-time front-end:
-  run ng serve in terminal in project folder
+  run 'ng serve' in terminal in project folder
 
-To observe back-end real-time:
-  run npm run start:server in terminal in project folder
+To start server:
+  run 'npm run start:server' in terminal in project folder
 
 
