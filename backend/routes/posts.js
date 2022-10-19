@@ -25,7 +25,7 @@ router.put("/:id", (req,res,next) => {
   const post = new Post({
     _id: req.body.id,
     title: req.body.title,
-    content: req.body.connect
+    content: req.body.content
   })
   Post.updateOne({_id: req.params.id}, post)
   .then(result => {
