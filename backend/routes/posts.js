@@ -102,8 +102,24 @@ router.put(
 });
 
 //receive request to get post, send posts to front-end, find() gets all posts
+//get query parameters for pagination
+//query.any-name-you-specify-as-parameter
+//'+' to convert string to int (req returns string)
 router.get("", (req, res, next) => {
-  Post.find().then(documents => {
+  const pageSize = +req.query.pagesize; //number of pages to display at a time
+  const currentPage = +req.query.page; //current page index
+  const postQuery = Post.find();
+
+  //this method checks for all entries so okay to use for small database, inefficient in large databases.
+  //if you're on page 2, you skip 1 page.
+  //limit amount of pages we return.
+  if(pageSize && currentPage){
+    postQuery
+      .skip(pageSize * (currentPage - 1))
+      .limit(pageSize);
+  }
+
+  postQuery.then(documents => {
     res.status(200).json({
       message: "Posts fetched successfully!",
       posts: documents
