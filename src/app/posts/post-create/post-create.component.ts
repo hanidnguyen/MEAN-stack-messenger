@@ -4,6 +4,7 @@ import { ActivatedRoute, ParamMap } from "@angular/router";
 
 import { PostsService } from "../posts.service";
 import { Post } from "../post.model";
+
 //import custom mimeType validator
 import { mimeType } from "./mime-type.validator";
 
@@ -13,11 +14,13 @@ import { mimeType } from "./mime-type.validator";
   styleUrls: ['./post-create.component.css']
 })
 
-//Template driven form control is in the html.
-//Reactive approach control of form is in here.
-//We use reactive approach to post images easier.
-//Use FormGroup to control how our components do things using the
-//component.ts file.
+/**
+ * Template driven form control is in the html.
+ * Reactive approach control of form is in here (implement FormGroup and Validators).
+ * We use reactive approach to easily post images.
+ * Use FormGroup to control how our components do things using the ts file.
+ */
+//
 export class PostCreateComponent implements OnInit {
   enteredTitle = "";
   enteredContent = "";
@@ -35,6 +38,14 @@ export class PostCreateComponent implements OnInit {
     public route: ActivatedRoute
   ) {}
 
+  /**
+   * Set up form properties and their validators
+   * Use custom validator for image type
+   * Subscribe to paramMap (from route) to check if a postId is in paramMap
+   * Switch to edit mode if postId is in paramMap, else stay on create mode.
+   * Edit mode: update all properties (to show on front-end)
+   * Create mode: set postId to null (postId generated from database)
+   */
   ngOnInit() {
     this.form = new FormGroup({
       title: new FormControl(null, {
@@ -72,15 +83,21 @@ export class PostCreateComponent implements OnInit {
     });
   }
 
-  //hook up image picking from html to ts
-  //tell angular event target in a html input element to access files.
-  //user give one file so we take the first one
-  //patch is update and then run validator
-  //reader convert file to URL
+  /**
+   *
+   * @param event
+   * Hook up image picking from html to ts
+   * Tell angular event target is a html input element to access files.
+   * User give one file so we take the first one (files[0])
+   * Patch (update) and then run validator
+   * Specify custom FileReader. onLoad, convert image file to string
+   * Call readAsDataUrl to use the custom FileReader.
+   */
   onImagePicked(event: Event) {
     const file = (event.target as HTMLInputElement).files[0];
     this.form.patchValue({ image: file });
     this.form.get("image").updateValueAndValidity();
+
     const reader = new FileReader();
     reader.onload = () => {
       this.imagePreview = reader.result as string;
@@ -88,6 +105,10 @@ export class PostCreateComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
+  /**
+   * Called whenever form is submitted (see html)
+   * Supports both create and edit mode.
+   */
   onSavePost() {
     if (this.form.invalid) {
       return;

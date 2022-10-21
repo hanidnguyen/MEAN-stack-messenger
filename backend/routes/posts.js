@@ -17,21 +17,22 @@ const MIME_TYPE_MAP = {
   "image/jpg": "jpg"
 };
 
-//saves files with multer
-//multer takes in 3 args: request, file and callback
+/**
+ * Saves files with multer
+ * multer takes in 3 args: request, file and callback
+ * isValid declare the custom error
+ * Callback error if invalid, else save to backend/images
+ */
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    //declare custom error
     const isValid = MIME_TYPE_MAP[file.mimetype];
     let error = new Error("Invalid mime type");
     if (isValid) {
       error = null;
     }
-    //use error if invalid, else save to backend/images
     cb(error, "backend/images");
   },
   filename: (req,file,cb) => {
-    //extract name
     const name = file.originalname
       .toLowerCase()
       .split(" ")
@@ -42,9 +43,11 @@ const storage = multer.diskStorage({
   }
 });
 
-//middleware to receive request to add post, and add post in db
-//pass multer as argument to read for file
-//.single to specify only process one file
+/**
+ * middleware to receive request to add post, and add post in db
+ * pass multer as argument to read for file
+ * .single to specify only process one file
+ */
 router.post(
   "",
 multer({ storage: storage }).single("image"),
@@ -72,16 +75,18 @@ multer({ storage: storage }).single("image"),
   });
 });
 
-//update / edit a post
-//get imagepath from request, and if a file is a sent construct imagepath to save
-//create a new post, then update to database.
+/**
+ * update / edit a post
+ * get imagepath from request, and if a file is a sent construct imagepath to save
+ * create a new post, then update to database.
+ */
 router.put(
   "/:id",
   multer({ storage: storage }).single("image"),
   (req,res,next) => {
     let imagePath = req.body.imagePath;
 
-    if(req.file){
+    if(req.file){ //if a new file is received, update imagePath
       const url = req.protocol + "://" + req.get("host");
       imagePath = url + "/images/" + req.file.filename;
     }
@@ -101,10 +106,12 @@ router.put(
 
 });
 
-//receive request to get post, send posts to front-end, find() gets all posts
-//get query parameters for pagination
-//query.any-name-you-specify-as-parameter
-//'+' to convert string to int (req returns string)
+/**
+ * Receive request to get post, then send posts to front-end. find() gets all posts
+ * Get query parameters for pagination
+ * query.any-name-you-specify-as-parameter
+ * '+' to convert string to int due to receiving string from req
+ */
 router.get("", (req, res, next) => {
   const pageSize = +req.query.pagesize; //number of pages to display at a time
   const currentPage = +req.query.page; //current page index
@@ -137,7 +144,7 @@ router.get("", (req, res, next) => {
     });
 });
 
-//receive request to get post with id
+//Receive request to get post with id
 router.get("/:id", (req,res,next) => {
   Post.findById(req.params.id).then(post => {
     if(post){
@@ -148,7 +155,7 @@ router.get("/:id", (req,res,next) => {
   });
 });
 
-//request to delete item in collection.
+//Request to delete item in collection.
 router.delete("/:id", (req, res, next) => {
   Post.deleteOne({ _id: req.params.id }).then(result => {
     console.log(result);

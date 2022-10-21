@@ -19,12 +19,17 @@ export class PostListComponent implements OnInit, OnDestroy {
   pageSizeOptions = [1,2,5,10];
   private postsSub: Subscription;
 
+  //dependency injection
   constructor(public postsService: PostsService) {}
 
-  //load spinner while fetching posts from backend
+  /**
+   * Load spinner while fetching posts from backend
+   * Call getPosts through posts.service
+   * Then subscribe to results and update: total posts and post count
+   */
   ngOnInit() {
     this.isLoading = true;
-    this.postsService.getPosts(this.postsPerPage,this.currentPage); //default: page 1
+    this.postsService.getPosts(this.postsPerPage,this.currentPage);
     this.postsSub = this.postsService.getPostUpdateListener()
       .subscribe((postData: {posts: Post[], postCount: number}) => {
         this.isLoading = false;
@@ -33,6 +38,11 @@ export class PostListComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * @param pageData
+   *
+   * Receive event pageData, extract information and get posts through service
+   */
   onChangedPage(pageData: PageEvent){
     this.isLoading = true;
     this.currentPage = pageData.pageIndex + 1; //page index starts with 0
@@ -40,7 +50,11 @@ export class PostListComponent implements OnInit, OnDestroy {
     this.postsService.getPosts(this.postsPerPage,this.currentPage);
   }
 
-  //get observable and call getPosts to update posts.
+  /**
+   *
+   * @param postId
+   * Subscribe to results from deletePost then call getPosts to update posts in front-end.
+   */
   onDelete(postId: string) {
     this.isLoading = true;
     this.postsService.deletePost(postId)
