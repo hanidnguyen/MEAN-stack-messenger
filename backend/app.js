@@ -24,6 +24,7 @@ mongoose
 //bodyParser provides Express middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
 //we have not given permission to access the images file,
 //this code allows it.
 app.use("/images", express.static(path.join("backend/images")));

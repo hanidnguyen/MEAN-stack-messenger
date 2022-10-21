@@ -109,6 +109,7 @@ router.get("", (req, res, next) => {
   const pageSize = +req.query.pagesize; //number of pages to display at a time
   const currentPage = +req.query.page; //current page index
   const postQuery = Post.find();
+  let fetchedPosts;
 
   //this method checks for all entries so okay to use for small database, inefficient in large databases.
   //if you're on page 2, you skip 1 page.
@@ -119,12 +120,21 @@ router.get("", (req, res, next) => {
       .limit(pageSize);
   }
 
-  postQuery.then(documents => {
-    res.status(200).json({
-      message: "Posts fetched successfully!",
-      posts: documents
+  //return number of posts, then send a response.
+  //chaining then(), share variable fetchedPosts between them
+  //in response return the maxPosts (current number of posts)
+  postQuery
+    .then(documents => {
+      fetchedPosts = documents;
+    return Post.count();
+    })
+    .then(count => {
+      res.status(200).json({
+        message: "Posts fetched successfully!",
+        posts: fetchedPosts,
+        maxPosts: count
+      });
     });
-  });
 });
 
 //receive request to get post with id
