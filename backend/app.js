@@ -1,3 +1,5 @@
+//import path so that any operating system can construct the path correctly
+const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
@@ -22,6 +24,9 @@ mongoose
 //bodyParser provides Express middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+//we have not given permission to access the images file,
+//this code allows it.
+app.use("/images", express.static(path.join("backend/images")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");

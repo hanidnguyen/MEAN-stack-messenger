@@ -1,21 +1,68 @@
 /**
  * For routes in /api/posts
+ * Multer is used to extract and save incoming files
  */
 
 const express = require("express");
+const multer = require("multer");
+
 const Post = require("../models/post");
+
 const router = express.Router();
 
+const MIME_TYPE_MAP = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/jpg": "jpg"
+};
+//saves files
+//multer takes in 3 args: request, file and callback
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    //declare custom error
+    const isValid = MIME_TYPE_MAP[file.mimetype];
+    let error = new Error("Invalid mime type");
+    if (isValid) {
+      error = null;
+    }
+    //use error if invalid, else save to backend/images
+    cb(error, "backend/images");
+  },
+  filename: (req,file,cb) => {
+    //extract name
+    const name = file.originalname
+      .toLowerCase()
+      .split(" ")
+      .join("-");
+    const ext = MIME_TYPE_MAP[file.mimetype];
+    //return the full file name (with date and extension)
+    cb(null, name + "-" + Date.now() + "." + ext);
+  }
+})
+
 //middleware to receive request to add post, and add post in db
-router.post("", (req, res, next) => {
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content
-  });
-  post.save().then(createdPost => {
-    res.status(201).json({
-      message: "Post added successfully",
-      postId: createdPost._id
+//pass multer as argument to read for file
+router.post(
+  "",
+multer({ storage: storage }).single("image"),
+  (req, res, next) => {
+  //get url of incoming request
+    const url = req.protocol + "://" + req.get("host");
+    const post = new Post({
+      title: req.body.title,
+      content: req.body.content,
+      imagePath: url + "/images/" + req.file.filename
+    });
+    post.save().then(createdPost => {
+      res.status(201).json({
+        message: "Post added successfully",
+        post: {
+        //beware of the spread operator! it converts a mongoose object to a
+        //complex mongoose object wrapped in _doc property (only this is displayed in real world).
+        //https://www.udemy.com/course/angular-2-and-nodejs-the-practical-guide/learn/lecture/10523234#questions/4851476
+        ...createdPost, //spread operator: used to copy attributes of createdPost to post
+        id: createdPost._id
+      }
     });
   });
 });
@@ -48,7 +95,7 @@ router.get("/:id", (req,res,next) => {
     if(post){
       res.status(200).json(post);
     } else {
-      res.status(404).json({message: 'Post not Found!'});
+      res.status(404).json({message: 'Post not found!'});
     }
   })
 });
