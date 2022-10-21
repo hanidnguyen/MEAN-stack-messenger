@@ -4,15 +4,16 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
-//import routes for /api/posts
+//import routes
 const postsRoutes = require('./routes/posts');
+const userRoutes = require('./routes/user');
 
 const app = express();
 
 //connect to mongodb with mongoose
 mongoose
   .connect(
-    "mongodb+srv://Hani:r17t5McPnCj6ojBk@cluster0.vqyni.mongodb.net/node-angular?retryWrites=true&w=majority"
+    "mongodb+srv://Hani:r17t5McPnCj6ojBk@cluster0.vqyni.mongodb.net/node-angular"
   )
   .then(() => {
     console.log("Connected to database!");
@@ -42,7 +43,8 @@ app.use((req, res, next) => {
   next();
 });
 
-//use imported routes
+//use imported routes, /posts for posts, /user for user related routes
 app.use("/api/posts", postsRoutes);
+app.use("/api/user", userRoutes);
 
 module.exports = app;
