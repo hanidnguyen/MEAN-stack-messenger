@@ -38,7 +38,7 @@ const storage = multer.diskStorage({
     //return the full file name (with date and extension)
     cb(null, name + "-" + Date.now() + "." + ext);
   }
-})
+});
 
 //middleware to receive request to add post, and add post in db
 //pass multer as argument to read for file
@@ -68,16 +68,25 @@ multer({ storage: storage }).single("image"),
 });
 
 //update / edit a post
-router.put("/:id", (req,res,next) => {
-  const post = new Post({
-    _id: req.body.id,
-    title: req.body.title,
-    content: req.body.content
-  })
-  Post.updateOne({_id: req.params.id}, post)
-  .then(result => {
-    res.status(200).json('Update successful!');
-  })
+router.put(
+  "/:id",
+  multer({ storage: storage }).single("image"),
+  (req,res,next) => {
+    let imagePath = req.body.imagePath;
+    if(req.file){
+      const url = req.protocol + "://" + req.get("host");
+      imagePath = url + "/images/" + req.file.filename;
+    }
+    const post = new Post({
+      _id: req.body.id,
+      title: req.body.title,
+      content: req.body.content,
+      imagePath: imagePath
+    });
+    Post.updateOne({_id: req.params.id}, post)
+    .then(result => {
+      res.status(200).json('Update successful!');
+    });
 });
 
 //receive request to get post, send posts to front-end
@@ -97,7 +106,7 @@ router.get("/:id", (req,res,next) => {
     } else {
       res.status(404).json({message: 'Post not found!'});
     }
-  })
+  });
 });
 
 //request to delete item in collection.
