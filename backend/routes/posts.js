@@ -1,5 +1,6 @@
 /**
  * For routes in /api/posts
+ * define new router to handle endpoints of incoming requests
  * Multer is used to extract and save incoming files
  */
 
@@ -15,7 +16,8 @@ const MIME_TYPE_MAP = {
   "image/jpeg": "jpg",
   "image/jpg": "jpg"
 };
-//saves files
+
+//saves files with multer
 //multer takes in 3 args: request, file and callback
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -42,6 +44,7 @@ const storage = multer.diskStorage({
 
 //middleware to receive request to add post, and add post in db
 //pass multer as argument to read for file
+//.single to specify only process one file
 router.post(
   "",
 multer({ storage: storage }).single("image"),
@@ -53,6 +56,8 @@ multer({ storage: storage }).single("image"),
       content: req.body.content,
       imagePath: url + "/images/" + req.file.filename
     });
+
+    //save to database
     post.save().then(createdPost => {
       res.status(201).json({
         message: "Post added successfully",
@@ -68,28 +73,35 @@ multer({ storage: storage }).single("image"),
 });
 
 //update / edit a post
+//get imagepath from request, and if a file is a sent construct imagepath to save
+//create a new post, then update to database.
 router.put(
   "/:id",
   multer({ storage: storage }).single("image"),
   (req,res,next) => {
     let imagePath = req.body.imagePath;
+
     if(req.file){
       const url = req.protocol + "://" + req.get("host");
       imagePath = url + "/images/" + req.file.filename;
     }
+
     const post = new Post({
       _id: req.body.id,
       title: req.body.title,
       content: req.body.content,
       imagePath: imagePath
     });
+
+    //patch in database
     Post.updateOne({_id: req.params.id}, post)
     .then(result => {
       res.status(200).json('Update successful!');
     });
+
 });
 
-//receive request to get post, send posts to front-end
+//receive request to get post, send posts to front-end, find() gets all posts
 router.get("", (req, res, next) => {
   Post.find().then(documents => {
     res.status(200).json({
@@ -99,6 +111,7 @@ router.get("", (req, res, next) => {
   });
 });
 
+//receive request to get post with id
 router.get("/:id", (req,res,next) => {
   Post.findById(req.params.id).then(post => {
     if(post){
