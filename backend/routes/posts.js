@@ -9,6 +9,10 @@ const multer = require("multer");
 
 const Post = require("../models/post");
 
+//Only posts need to check for authentication.
+//Any user should be able to go to login / signup page
+const checkAuth = require("../middleware/check-auth");
+
 const router = express.Router();
 
 const MIME_TYPE_MAP = {
@@ -44,13 +48,15 @@ const storage = multer.diskStorage({
 });
 
 /**
- * middleware to receive request to add post, and add post in db
- * pass multer as argument to read for file
+ * Middleware to receive request to add post, and add post in db
+ * Pass multer as argument to read for file
  * .single to specify only process one file
+ * Simply pass checkAuth reference and Express will execute the authentication middleware.
  */
 router.post(
   "",
-multer({ storage: storage }).single("image"),
+  checkAuth,
+  multer({ storage: storage }).single("image"),
   (req, res, next) => {
   //get url of incoming request
     const url = req.protocol + "://" + req.get("host");
@@ -76,12 +82,14 @@ multer({ storage: storage }).single("image"),
 });
 
 /**
- * update / edit a post
- * get imagepath from request, and if a file is a sent construct imagepath to save
- * create a new post, then update to database.
+ * Update / edit a post
+ * Get imagepath from request, and if a file is a sent construct imagepath to save
+ * Create a new post, then update to database.
+ * Simply pass checkAuth reference and Express will execute the authentication middleware.
  */
 router.put(
   "/:id",
+  checkAuth,
   multer({ storage: storage }).single("image"),
   (req,res,next) => {
     let imagePath = req.body.imagePath;
@@ -111,6 +119,7 @@ router.put(
  * Get query parameters for pagination
  * query.any-name-you-specify-as-parameter
  * '+' to convert string to int due to receiving string from req
+ * No need for auth, any user can see the post but to edit it you need authentication.
  */
 router.get("", (req, res, next) => {
   const pageSize = +req.query.pagesize; //number of pages to display at a time
@@ -144,7 +153,8 @@ router.get("", (req, res, next) => {
     });
 });
 
-//Receive request to get post with id
+//Receive request to get post with id,
+//No need for auth, any user can see the post but to edit it you need authentication.
 router.get("/:id", (req,res,next) => {
   Post.findById(req.params.id).then(post => {
     if(post){
@@ -155,8 +165,11 @@ router.get("/:id", (req,res,next) => {
   });
 });
 
-//Request to delete item in collection.
-router.delete("/:id", (req, res, next) => {
+/**
+ * Request to delete item in collection.
+ * Simply pass checkAuth reference and Express will execute the authentication middleware.
+ *  */
+router.delete("/:id", checkAuth, (req, res, next) => {
   Post.deleteOne({ _id: req.params.id }).then(result => {
     console.log(result);
     res.status(200).json({ message: "Post deleted!" });

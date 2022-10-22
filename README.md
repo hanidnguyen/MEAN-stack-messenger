@@ -35,4 +35,11 @@ To observe real-time front-end:
 To start server:
   run 'npm run start:server' in terminal in project folder
 
+Notes:
+SPA Authentication - different from traditional full-stack app 
+- Traditional full-stack app would use a session for this. So when a user login on the server a session is created and session ID is returned in a cookie to client, so the browser can store it there. Then for every future request, we can automatically send that cookie and validate on the server, grant access if cookie ID matches a valid sessions on the server.
+-> This approach however does not work as our SPA backend is stateless and decoupled (separated) from the frontend. So front-end only send requests to these URLs but our server does not store any information about the app, therefore server also doesn't store any sessions.
+
+- Our single page application will instead allow server to create a JSON Web Tokens (a hashed long string that can't be faked or changed or guessed) that only the server can validate upon a successful login. We then send token to front-end to store in the angular app, then attach it to all future requests that is sent back to backend.
+
 
