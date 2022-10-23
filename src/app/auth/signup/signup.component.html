@@ -31,7 +31,8 @@
     <button
       mat-raised-button
       color="accent"
-      type="submit">
+      type="submit"
+      *ngIf="!isLoading">
       Sign up
     </button>
   </form>
