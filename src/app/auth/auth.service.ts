@@ -58,6 +58,7 @@ export class AuthService {
    * @param password
    *
    * Request to login. Set timer to logout because token will expire.
+   * Update local storage with token and expiration such that user auth state is prolonged after page refresh.
    */
   login(email: string, password: string){
     const authData: AuthData = {
@@ -71,26 +72,89 @@ export class AuthService {
         this.token = token;
         if(token){
           const expiresInDuration = response.expiresIn;
-          this.tokenTimer = setTimeout(() => {
-            this.logout();
-          }, expiresInDuration * 1000);
+          this.setAuthTimer(expiresInDuration);
           this.isAuthenticated = true;
           this.authStatusListener.next(true);
+          const now = new Date();
+          const expirationDate = new Date(now.getTime() + expiresInDuration * 1000);
+          this.saveAuthData(token,expirationDate);
+          console.log(expirationDate);
           this.router.navigate(['/']);
         }
       });
+  }
+  /**
+   * Auto authenticate user when page reloads
+   * If expiresIn not yet reached zero, then user is authenticated and emit next to update components.
+   * Run in app component
+   */
+  autoAuthUser(){
+    const authInformation = this.getAuthData();
+    if(!authInformation){
+      return;
+    }
+    const now = new Date();
+    const expireIn = authInformation.expirationDate.getTime() - now.getTime();
+    if(expireIn > 0){
+      this.token = authInformation.token;
+      this.isAuthenticated = true;
+      this.setAuthTimer(expireIn / 1000);
+      this.authStatusListener.next(true);
+    }
   }
 
   /**
    * Log out function set token and isAuthenticated to null/false
    * Then emit next to update components.
-   * Clear token timer once user logs out.
+   * Clear token timer and local storage data (has token and expiration) once user logs out.
    */
   logout(){
     this.token = null;
     this.isAuthenticated = false;
     this.authStatusListener.next(false);
-    this.router.navigate(['/']);
     clearTimeout(this.tokenTimer);
+    this.clearAuthData();
+    this.router.navigate(['/']);
+  }
+
+  /**
+   *
+   * @param duration
+   * Set timer everytime user logs in
+   */
+  private setAuthTimer(duration: number){
+    console.log('Setting timer: ' + duration);
+    this.tokenTimer = setTimeout(() => {
+      this.logout();
+    }, duration * 1000);
+  }
+
+  //save token in local storage protected by Angular so user auth state prolongs after website refresh.
+  private saveAuthData(token: string, expirationDate: Date){
+    localStorage.setItem('token',token);
+    localStorage.setItem('expiration', expirationDate.toISOString());
+  }
+
+  private clearAuthData(){
+    localStorage.removeItem('token');
+    localStorage.removeItem('expiration');
+  }
+
+  /**
+   *
+   * @returns the local storage items
+   *
+   * Function to return local storage items if there is any.
+   */
+  private getAuthData(){
+    const token = localStorage.getItem('token');
+    const expirationDate = localStorage.getItem('expiration');
+    if(!token || !expirationDate){
+      return;
+    }
+    return {
+      token: token,
+      expirationDate: new Date(expirationDate)
+    }
   }
 }
