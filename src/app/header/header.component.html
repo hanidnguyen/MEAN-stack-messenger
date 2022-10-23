@@ -20,7 +20,7 @@
       </a>
     </li>
     <li *ngIf="userIsAuthenticated">
-      <button mat-button>Log out</button>
+      <button mat-button (click)="onLogout()">Log out</button>
     </li>
   </ul>
 </mat-toolbar>

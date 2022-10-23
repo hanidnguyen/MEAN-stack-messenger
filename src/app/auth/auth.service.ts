@@ -66,4 +66,14 @@ export class AuthService {
         }
       });
   }
+
+  /**
+   * Log out function set token and isAuthenticated to null/false
+   * Then emit next to update components.
+   */
+  logout(){
+    this.token = null;
+    this.isAuthenticated = false;
+    this.authStatusListener.next(false);
+  }
 }
