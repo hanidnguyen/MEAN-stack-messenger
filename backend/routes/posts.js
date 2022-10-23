@@ -106,10 +106,16 @@ router.put(
       imagePath: imagePath
     });
 
-    //patch in database
-    Post.updateOne({_id: req.params.id}, post)
+    //patch in database only if creator id is same with authorized user id.
+    Post.updateOne({_id: req.params.id, creator: req.userData.userId }, post)
     .then(result => {
-      res.status(200).json('Update successful!');
+      //get modifiedCount from the result returned by mongoose updateOne.
+      if(result.modifiedCount > 0) {
+        res.status(200).json({ message: 'Update successful!' });
+      } else {
+        res.status(401).json({ message: 'Not authorized!' });
+      }
+
     });
 
 });
@@ -170,9 +176,12 @@ router.get("/:id", (req,res,next) => {
  * Simply pass checkAuth reference and Express will execute the authentication middleware.
  *  */
 router.delete("/:id", checkAuth, (req, res, next) => {
-  Post.deleteOne({ _id: req.params.id }).then(result => {
-    console.log(result);
-    res.status(200).json({ message: "Post deleted!" });
+  Post.deleteOne({ _id: req.params.id, creator: req.userData.userId }).then(result => {
+    if(result.deletedCount > 0) {
+      res.status(200).json({ message: 'Deletion successful!' });
+    } else {
+      res.status(401).json({ message: 'Not authorized!' });
+    }
   });
 });
 
