@@ -25,7 +25,7 @@ export class AuthService {
   }
 
   //authStatus is private. Only return as observable such that
-  //only this service can emit and other component only listen.
+  //only this service can emit and other components only listen.
   getAuthStatusListener(){
     return this.authStatusListener.asObservable();
   }

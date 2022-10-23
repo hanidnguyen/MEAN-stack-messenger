@@ -63,9 +63,9 @@ router.post(
     const post = new Post({
       title: req.body.title,
       content: req.body.content,
-      imagePath: url + "/images/" + req.file.filename
+      imagePath: url + "/images/" + req.file.filename,
+      creator: req.userData.userId
     });
-
     //save to database
     post.save().then(createdPost => {
       res.status(201).json({
@@ -115,7 +115,7 @@ router.put(
 });
 
 /**
- * Receive request to get post, then send posts to front-end. find() gets all posts
+ * Receive request to get all posts, then send posts to front-end. find() gets all posts
  * Get query parameters for pagination
  * query.any-name-you-specify-as-parameter
  * '+' to convert string to int due to receiving string from req
@@ -153,7 +153,7 @@ router.get("", (req, res, next) => {
     });
 });
 
-//Receive request to get post with id,
+//Receive request to get a post with an id,
 //No need for auth, any user can see the post but to edit it you need authentication.
 router.get("/:id", (req,res,next) => {
   Post.findById(req.params.id).then(post => {

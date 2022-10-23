@@ -49,6 +49,7 @@ import { AuthInterceptor } from './auth/auth-interceptor';
     MatProgressSpinnerModule,
     MatPaginatorModule
   ],
+  //Angular automatically call interceptor for us in the providers.
   //multi property to tell Angular not to overwrite existing interceptors.
   providers: [{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}],
   bootstrap: [AppComponent]

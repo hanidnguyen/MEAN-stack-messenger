@@ -6,6 +6,7 @@ import { AuthService } from "./auth.service";
 /**
  * Interceptor service for Http client
  * Provide service in app module
+ * Whereas checkAuth is for incoming requests on the backend, interceptor is for outgoing requests on the frontend.
  * Intercept on <any> outgoing HttpRequest
  * Intercept next behaves like an observable, such that we can return next to allow other components to continue to subscribe
  * Inject one service to another with empty @Injectable and constructor.
