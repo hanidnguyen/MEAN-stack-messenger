@@ -20,7 +20,10 @@ export class AuthGuard implements CanActivate{
    * We can rely on isAuth to be current as it updates if we login or logout.
    * Redirect user to login page when they are not authenticated to reach a specific route.
    */
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> {
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean | Observable<boolean> | Promise<boolean> {
     const isAuth = this.authService.getIsAuth();
     if(!isAuth){
       this.router.navigate(['/login']);

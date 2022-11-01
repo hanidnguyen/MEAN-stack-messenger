@@ -25,14 +25,13 @@ router.post("/signup", (req,res,next) => {
             message: 'User created!',
             result: result
           });
+        })
+        .catch(err => { //catch error if user give existing email
+          res.status(500).json({
+            message: "Invalid authentication credentials!"
+          })
         });
-    })
-    .catch(err => { //catch error if user give existing email
-      res.status(500).json({
-        error: err
-      })
     });
-
 });
 
 /**
@@ -73,9 +72,9 @@ router.post("/login", (req,res,next) => {
     })
     .catch(err => {
       return res.status(401).json({
-        message: 'Auth failed'
-      })
+        message: "Invalid authentication credentials!"
+      });
     });
-})
+});
 
 module.exports = router;

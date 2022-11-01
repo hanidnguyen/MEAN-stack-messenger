@@ -1,4 +1,4 @@
-import { Component, OnInit} from "@angular/core";
+import { Component, OnDestroy, OnInit} from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, ParamMap } from "@angular/router";
 
@@ -7,6 +7,8 @@ import { Post } from "../post.model";
 
 //import custom mimeType validator
 import { mimeType } from "./mime-type.validator";
+import { Subscription } from "rxjs";
+import { AuthService } from "src/app/auth/auth.service";
 
 @Component({
   selector: 'app-post-create',
@@ -21,7 +23,7 @@ import { mimeType } from "./mime-type.validator";
  * Use FormGroup to control how our components do things using the ts file.
  */
 //
-export class PostCreateComponent implements OnInit {
+export class PostCreateComponent implements OnInit, OnDestroy {
   enteredTitle = "";
   enteredContent = "";
   post: Post;
@@ -30,12 +32,14 @@ export class PostCreateComponent implements OnInit {
   imagePreview: string;
   private mode = "create";
   private postId: string;
+  private authStatusSub: Subscription;
 
   //dependency injection
   //also inject activated route to manage how this component will be used for different routes.
   constructor(
     public postsService: PostsService,
-    public route: ActivatedRoute
+    public route: ActivatedRoute,
+    private authService: AuthService
   ) {}
 
   /**
@@ -47,6 +51,10 @@ export class PostCreateComponent implements OnInit {
    * Create mode: set postId to null (postId generated from database)
    */
   ngOnInit() {
+    this.authStatusSub = this.authService.getAuthStatusListener()
+    .subscribe(authStatus => {
+      this.isLoading = false;
+    });
     this.form = new FormGroup({
       title: new FormControl(null, {
         validators: [Validators.required, Validators.minLength(3)]
@@ -130,5 +138,9 @@ export class PostCreateComponent implements OnInit {
       );
     }
     this.form.reset();
+  }
+
+  ngOnDestroy() {
+    this.authStatusSub.unsubscribe();
   }
 }
