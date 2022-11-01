@@ -2,17 +2,14 @@
  * For routes in /api/posts
  * define new router to handle endpoints of incoming requests
  * Multer is used to extract and save incoming files
+ * Only posts need to check for authentication.
+ * Any user should be able to go to login / signup page
  */
 
 const express = require("express");
 const multer = require("multer");
-
-const Post = require("../models/post");
-
-//Only posts need to check for authentication.
-//Any user should be able to go to login / signup page
+const PostController = require("../controllers/posts")
 const checkAuth = require("../middleware/check-auth");
-
 const router = express.Router();
 
 const MIME_TYPE_MAP = {
@@ -48,165 +45,45 @@ const storage = multer.diskStorage({
 });
 
 /**
- * Middleware to receive request to add post, and add post in db
+ * Create post and add to db (calling from controllers)
  * Pass multer as argument to read for file
  * .single to specify only process one file
  * Simply pass checkAuth reference and Express will execute the authentication middleware.
  */
 router.post(
-  "",
+  "", //path after /api/posts
   checkAuth,
   multer({ storage: storage }).single("image"),
-  (req, res, next) => {
-  //get url of incoming request
-    const url = req.protocol + "://" + req.get("host");
-    const post = new Post({
-      title: req.body.title,
-      content: req.body.content,
-      imagePath: url + "/images/" + req.file.filename,
-      creator: req.userData.userId
-    });
-    //save to database
-    post.save().then(createdPost => {
-      res.status(201).json({
-        message: "Post added successfully",
-        post: {
-        //beware of the spread operator! it converts a mongoose object to a
-        //complex mongoose object wrapped in _doc property (only this is displayed in real world).
-        //https://www.udemy.com/course/angular-2-and-nodejs-the-practical-guide/learn/lecture/10523234#questions/4851476
-        ...createdPost, //spread operator: used to copy attributes of createdPost to post
-        id: createdPost._id
-        }
-      });
-    })
-    .catch(error => {
-      res.status(500).json({
-        message: "Creating a post failed!"
-      });
-    });
-});
+  PostController.createPost
+  );
 
 /**
  * Update / edit a post
- * Get imagepath from request, and if a file is a sent construct imagepath to save
- * Create a new post, then update to database.
  * Simply pass checkAuth reference and Express will execute the authentication middleware.
  */
 router.put(
-  "/:id",
+  "/:id", //path after /api/posts
   checkAuth,
   multer({ storage: storage }).single("image"),
-  (req,res,next) => {
-    let imagePath = req.body.imagePath;
-
-    if(req.file){ //if a new file is received, update imagePath
-      const url = req.protocol + "://" + req.get("host");
-      imagePath = url + "/images/" + req.file.filename;
-    }
-
-    const post = new Post({
-      _id: req.body.id,
-      title: req.body.title,
-      content: req.body.content,
-      imagePath: imagePath,
-      creator: req.userData.userId
-    });
-
-    //patch in database only if creator id is same with authorized user id.
-    Post.updateOne({_id: req.params.id, creator: req.userData.userId }, post)
-    .then(result => {
-      //get modifiedCount from the result returned by mongoose updateOne.
-      if(result.modifiedCount > 0) {
-        res.status(200).json({ message: 'Update successful!' });
-      } else {
-        res.status(401).json({ message: 'Not authorized!' });
-      }
-    })
-    //catch technical errors: eg. unable to connect to database
-    .catch(error => {
-      res.status(500).json({
-        message: "Couldn't update post!"
-      });
-    });
-
-});
+  PostController.updatePost
+);
 
 /**
- * Receive request to get all posts, then send posts to front-end. find() gets all posts
- * Get query parameters for pagination
- * query.any-name-you-specify-as-parameter
- * '+' to convert string to int due to receiving string from req
+ * Receive request to get all posts, then send posts to front-end.
  * No need for auth, any user can see the post but to edit it you need authentication.
  */
-router.get("", (req, res, next) => {
-  const pageSize = +req.query.pagesize; //number of pages to display at a time
-  const currentPage = +req.query.page; //current page index
-  const postQuery = Post.find();
-  let fetchedPosts;
+router.get("", PostController.getPosts);
 
-  //this method checks for all entries so okay to use for small database, inefficient in large databases.
-  //if you're on page 2, you skip 1 page.
-  //limit amount of pages we return.
-  if(pageSize && currentPage){
-    postQuery
-      .skip(pageSize * (currentPage - 1))
-      .limit(pageSize);
-  }
-
-  //return number of posts, then send a response.
-  //chaining then(), share variable fetchedPosts between them
-  //in response return the maxPosts (current number of posts)
-  postQuery
-    .then(documents => {
-      fetchedPosts = documents;
-    return Post.count();
-    })
-    .then(count => {
-      res.status(200).json({
-        message: "Posts fetched successfully!",
-        posts: fetchedPosts,
-        maxPosts: count
-      });
-    })
-    .catch(error => {
-      res.status(500).json({
-        message: "Fetching posts failed!"
-      });
-    });
-});
-
-//Receive request to get a post with an id,
-//No need for auth, any user can see the post but to edit it you need authentication.
-router.get("/:id", (req,res,next) => {
-  Post.findById(req.params.id).then(post => {
-    if(post){
-      res.status(200).json(post);
-    } else {
-      res.status(404).json({message: 'Post not found!'});
-    }
-  }).catch(error => {
-    res.status(500).json({
-      message: "Fetching post failed!"
-    });
-  });
-});
+/**
+ * Receive request to get a post with an id,
+ * No need for auth, any user can see the post but to edit it you need authentication.
+ */
+router.get("/:id", PostController.getPost);
 
 /**
  * Request to delete item in collection.
  * Simply pass checkAuth reference and Express will execute the authentication middleware.
  *  */
-router.delete("/:id", checkAuth, (req, res, next) => {
-  Post.deleteOne({ _id: req.params.id, creator: req.userData.userId }).then(result => {
-    if(result.deletedCount > 0) {
-      res.status(200).json({ message: 'Deletion successful!' });
-    } else {
-      res.status(401).json({ message: 'Not authorized!' });
-    }
-  }).catch(error => {
-    res.status(500).json({
-      message: "Delete post failed!"
-    });
-  });
-});
+router.delete("/:id", checkAuth, PostController.deletePost);
 
 module.exports = router;

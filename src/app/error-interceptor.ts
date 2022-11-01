@@ -7,7 +7,8 @@ import { ErrorComponent } from "./error/error.component";
 
 /**
  * Interceptor to catch HTTP errors in any http request stream.
- * Return a newly generated observable with that error for posts service to use: return throwError();
+ * Open error dialog when catching http errors
+ * Return a newly generated observable with that error for services to use: return throwError();
  */
 
 @Injectable()
