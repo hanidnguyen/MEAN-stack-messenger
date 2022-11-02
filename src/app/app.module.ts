@@ -11,7 +11,6 @@ import { ErrorInterceptor } from 'src/app/error-interceptor';
 import { ErrorComponent } from './error/error.component';
 import { AngularMaterialModule } from './angular-material.module';
 import { PostsModule } from './posts/posts.module';
-import { AuthModule } from './auth/auth.module';
 
 /**
  * Register all components, angular material here!
@@ -28,8 +27,7 @@ import { AuthModule } from './auth/auth.module';
     BrowserAnimationsModule,
     HttpClientModule,
     AngularMaterialModule,
-    PostsModule,
-    AuthModule
+    PostsModule
   ],
   //Define the interceptors used for this app
   //Angular automatically call interceptor for us in the providers.
