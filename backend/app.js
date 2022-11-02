@@ -13,7 +13,9 @@ const app = express();
 //connect to mongodb with mongoose
 mongoose
   .connect(
-    "mongodb+srv://Hani:r17t5McPnCj6ojBk@cluster0.vqyni.mongodb.net/node-angular"
+    "mongodb+srv://Hani:" +
+    process.env.MONGO_ATLAS_PW +
+    "@cluster0.vqyni.mongodb.net/node-angular"
   )
   .then(() => {
     console.log("Connected to database!");

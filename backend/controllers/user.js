@@ -60,10 +60,10 @@ exports.userLogin = (req,res,next) => {
           message: 'Auth failed'
         });
       }
-      //create a new token with given input and our super long password (should be more complicated than this)
+      //create a new token with given input and saved password from nodemon json declared env variables
       const token = jwt.sign(
         { email: fetchedUser.email, userId: fetchedUser._id },
-        'secret_this_should_be_longer',
+        process.env.JWT_KEY,
         { expiresIn: '1h'} //security mechanism to ensure it doesn't last forever.
         );
         res.status(200).json({
