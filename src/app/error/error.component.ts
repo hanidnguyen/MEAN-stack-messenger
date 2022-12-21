@@ -1,14 +1,31 @@
-import { Component, Inject } from "@angular/core"
+import { Component, Inject } from "@angular/core";
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
+// import { Subscription } from "rxjs";
 
-/**
- * Inject the dialog message into this component.
- * A special way of injecting data into this component due to the special way it is created.
- */
+// import { ErrorService } from "./error.service";
 
 @Component({
-  templateUrl: './error.component.html'
+  templateUrl: "./error.component.html",
+  selector: "app-error",
+  // styleUrls: ["./error.component.css"]
 })
 export class ErrorComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: {message: string}){}
+  // data: { message: string };
+  // private errorSub: Subscription;
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { message: string }) {}
+  // constructor(private errorService: ErrorService) {}
+
+  // ngOnInit() {
+  //   this.errorSub = this.errorService.getErrorListener().subscribe(message => {
+  //     this.data = { message: message };
+  //   });
+  // }
+
+  // onHandleError() {
+  //   this.errorService.handleError();
+  // }
+
+  // ngOnDestroy() {
+  //   this.errorSub.unsubscribe();
+  // }
 }
