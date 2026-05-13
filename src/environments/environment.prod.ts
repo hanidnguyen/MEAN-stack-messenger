@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: '/api'
+  apiUrl: 'https://mean-stack-messenger-qfkk.vercel.app/api'
 };
