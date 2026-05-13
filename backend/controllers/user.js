@@ -19,6 +19,7 @@ exports.createUser = (req,res,next) => {
         email: req.body.email,
         password: hash
       });
+
       user
         .save()
         .then(result => {
@@ -27,7 +28,14 @@ exports.createUser = (req,res,next) => {
             result: result
           });
         })
-        .catch(err => { //catch error if user give existing email
+        .catch(err => { //Mongoose 9 / MongoDC native duplicate key error code. Catch error if user give existing email
+          if(err.code === 11000) {
+            return res.status(400).json({
+              message: "Email already exists!"
+            });
+          }
+
+          //catch other database or server errors
           res.status(500).json({
             message: "Invalid authentication credentials!"
           })
