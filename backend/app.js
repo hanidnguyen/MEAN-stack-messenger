@@ -9,27 +9,22 @@ const mongoose = require("mongoose");
 //import routes
 const postsRoutes = require('./routes/posts');
 const userRoutes = require('./routes/user');
-const dbURI = 'mongodb+srv://hanidnguyen_db_user:HZnHQA390gUsKk7y@myfirstdatabase.op2h6do.mongodb.net/?appName=myFirstDatabase'; 
-
-
-mongoose.connect(dbURI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((error) => console.error('Connection error:', error));
 
 const app = express();
 //connect to mongodb with mongoose
-// mongoose
-//   .connect(
-//      "mongodb://hanidnguyen_db_user:HZnHQA390gUsKk7y@myfirstdatabase.op2h6do.mongodb.net/?appName=myFirstDatabase"
-//   )
-//   .then(() => {
-//     console.log("Connected to database!");
-//   })
-//   .catch(err => {
-//     console.log("Connection failed!");
-//     console.log(err)
-//   });
-
+mongoose
+  .connect(
+     "mongodb+srv://hanidnguyen_db_user:"+
+     process.env.MONGO_ATLAS_PW +
+     "@myfirstdatabase.op2h6do.mongodb.net/?appName=myFirstDatabase"
+  )
+  .then(() => {
+    console.log("Connected to database!");
+  })
+  .catch(err => {
+    console.log("Connection failed!");
+    console.log(err)
+  });
 
 //bodyParser provides Express middleware
 app.use(bodyParser.json());
