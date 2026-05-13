@@ -23,9 +23,9 @@
     "@angular/router": "^14.2.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
-    "express": "^4.18.2",
+    "express": "^4.22.2",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.6.5",
+    "mongoose": "^6.0.0",
     "mongoose-unique-validator": "^3.1.0",
     "multer": "^1.4.5-lts.1",
     "rxjs": "~7.5.0",
@@ -45,5 +45,19 @@
     "karma-jasmine-html-reporter": "~2.0.0",
     "nodemon": "^2.0.20",
     "typescript": "~4.7.2"
-  }
+  },
+  "description": "This backend folder can be anywhere since it is not related to angular front end in any way.\r Placed it in the mean-course folder simply for learning.",
+  "main": "karma.conf.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanidnguyen/MEAN-stack-messenger.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/hanidnguyen/MEAN-stack-messenger/issues"
+  },
+  "homepage": "https://github.com/hanidnguyen/MEAN-stack-messenger#readme"
 }

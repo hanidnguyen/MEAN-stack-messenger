@@ -1,3 +1,5 @@
+const dns = require('node:dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']); // Forces Node.js to use Google DNS
 //import path so that any operating system can construct the path correctly
 const path = require("path");
 const express = require("express");
@@ -7,22 +9,27 @@ const mongoose = require("mongoose");
 //import routes
 const postsRoutes = require('./routes/posts');
 const userRoutes = require('./routes/user');
+const dbURI = 'mongodb+srv://hanidnguyen_db_user:HZnHQA390gUsKk7y@myfirstdatabase.op2h6do.mongodb.net/?appName=myFirstDatabase'; 
+
+
+mongoose.connect(dbURI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((error) => console.error('Connection error:', error));
 
 const app = express();
-
 //connect to mongodb with mongoose
-mongoose
-  .connect(
-    "mongodb+srv://Hani:" +
-    process.env.MONGO_ATLAS_PW +
-    "@cluster0.vqyni.mongodb.net/node-angular"
-  )
-  .then(() => {
-    console.log("Connected to database!");
-  })
-  .catch(() => {
-    console.log("Connection failed!");
-  });
+// mongoose
+//   .connect(
+//      "mongodb://hanidnguyen_db_user:HZnHQA390gUsKk7y@myfirstdatabase.op2h6do.mongodb.net/?appName=myFirstDatabase"
+//   )
+//   .then(() => {
+//     console.log("Connected to database!");
+//   })
+//   .catch(err => {
+//     console.log("Connection failed!");
+//     console.log(err)
+//   });
+
 
 //bodyParser provides Express middleware
 app.use(bodyParser.json());
